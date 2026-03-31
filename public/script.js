@@ -49,10 +49,10 @@ function updateHud() {
   missValue.textContent = `${game.misses} / 3`;
 
   const labels = {
-    idle: "Ta ett foto for att borja",
-    ready: "Tryck start och knacka pa dorrar",
-    running: "Tryck pa skarmen vid dorren",
-    gameover: "Rundan ar slut",
+    idle: "Ta ett foto för att börja",
+    ready: "Tryck start och knacka på dörrar",
+    running: "Tryck på skärmen vid dörren",
+    gameover: "Rundan är slut",
     submitting: "Skickar in resultat",
   };
 
@@ -231,7 +231,7 @@ function markMiss(door) {
   updateHud();
 
   if (game.misses >= 3) {
-    endGame("Tre missade dorrar. Fyll i dina uppgifter for att komma med pa highscore-listan.");
+    endGame("Tre missade dörrar. Fyll i dina uppgifter för att komma med på highscore-listan.");
   }
 }
 
@@ -283,7 +283,7 @@ function handleTap() {
 
   if (targetDoor.isSosse) {
     targetDoor.knocked = true;
-    endGame("Aj da! Du knackade pa en Sosse och akte ut direkt.");
+    endGame("Aj då! Du knackade på en Sosse och åkte ut direkt.");
     return;
   }
 
@@ -306,7 +306,7 @@ async function startCamera() {
     game.activeStream = stream;
     cameraPreview.srcObject = stream;
     takePhotoButton.disabled = false;
-    statusValue.textContent = "Ta en bild nar du ar redo";
+    statusValue.textContent = "Ta en bild när du är redo";
   } catch (error) {
     statusValue.textContent = "Kameran kunde inte starta";
     console.error(error);
@@ -391,14 +391,14 @@ function startGame() {
   game.misses = 0;
   game.state = "running";
   updateHud();
-  actionButton.textContent = "Tryck pa skarmen for att knacka";
+  actionButton.textContent = "Tryck på skärmen för att knacka";
   actionButton.disabled = true;
   resetDoors();
   cancelAnimationFrame(game.animationFrame);
   game.animationFrame = requestAnimationFrame(gameLoop);
 }
 
-function endGame(message = "Fyll i dina uppgifter for att komma med pa highscore-listan.") {
+function endGame(message = "Fyll i dina uppgifter för att komma med på highscore-listan.") {
   game.state = "gameover";
   game.endMessage = message;
   updateHud();
@@ -436,8 +436,8 @@ async function submitScore(event) {
 
     const result = await response.json();
     formStatus.textContent = result.emailStatus.delivered
-      ? "Tack! Du ar nu med pa topplistan."
-      : "Tack! Resultatet sparades, men e-post ar inte konfigurerad an.";
+      ? "Tack! Du är nu med på topplistan."
+      : "Tack! Resultatet sparades, men e-post är inte konfigurerad än.";
 
     setTimeout(resetExperience, 1800);
   } catch (error) {
@@ -463,7 +463,7 @@ function resetExperience() {
   actionButton.disabled = true;
   scoreForm.reset();
   formStatus.textContent = "";
-  finalMessage.textContent = "Fyll i dina uppgifter for att komma med pa highscore-listan.";
+  finalMessage.textContent = "Fyll i dina uppgifter för att komma med på highscore-listan.";
   gameOverOverlay.classList.add("hidden");
   gameOverOverlay.setAttribute("aria-hidden", "true");
   resetDoors();
@@ -473,14 +473,14 @@ function resetExperience() {
 }
 
 async function resetScoresFromKiosk() {
-  const confirmed = window.confirm("Ar du saker pa att du vill nollstalla highscore-listan?");
+  const confirmed = window.confirm("Är du säker på att du vill nollställa highscore-listan?");
 
   if (!confirmed) {
     return;
   }
 
   adminResetButton.disabled = true;
-  adminResetStatus.textContent = "Nollstaller highscore...";
+  adminResetStatus.textContent = "Nollställer highscore...";
 
   try {
     const response = await fetch("/api/scores/reset", {
@@ -488,10 +488,10 @@ async function resetScoresFromKiosk() {
     });
 
     if (!response.ok) {
-      throw new Error("Kunde inte nollstalla highscore-listan.");
+      throw new Error("Kunde inte nollställa highscore-listan.");
     }
 
-    adminResetStatus.textContent = "Highscore-listan ar nollstalld.";
+    adminResetStatus.textContent = "Highscore-listan är nollställd.";
   } catch (error) {
     adminResetStatus.textContent = error.message;
   } finally {

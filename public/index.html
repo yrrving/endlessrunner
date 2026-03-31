@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Knacka dorren</title>
+    <title>Knacka dörren</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Ubuntu:wght@500;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles.css" />
@@ -15,11 +15,11 @@
   <body class="kiosk">
     <main class="app-shell">
       <section class="panel brand-panel">
-        <p class="eyebrow">Moderaternas arsmote</p>
-        <h1>Knacka pa flest dorrar</h1>
+        <p class="eyebrow">Moderaternas årsmöte</p>
+        <h1>Knacka på flest dörrar</h1>
         <p class="intro">
-          Ta en bild, fa ditt ansikte pa spelaren och knacka pa dorrar i farten. Missar du tre
-          ganger ar rundan over.
+          Ta en bild, få ditt ansikte på spelaren och knacka på dörrar i farten. Missar du tre
+          gånger är rundan över.
         </p>
         <div class="rules">
           <div>
@@ -32,10 +32,10 @@
           </div>
           <div>
             <span>3</span>
-            Tryck pa skarmen nar du ar vid en dorr
+            Tryck på skärmen när du är vid en dörr
           </div>
         </div>
-        <a class="tv-link" href="/tv" target="_blank" rel="noreferrer">Oppna TV-vyn</a>
+        <a class="tv-link" href="/tv" target="_blank" rel="noreferrer">Öppna TV-vyn</a>
       </section>
 
       <section class="panel game-panel">
@@ -44,7 +44,7 @@
             <video id="cameraPreview" autoplay playsinline muted></video>
             <div class="face-guide" aria-hidden="true">
               <div class="face-guide-oval">
-                <span>Placera ansiktet har</span>
+                <span>Placera ansiktet här</span>
               </div>
             </div>
             <canvas id="snapshotCanvas" width="300" height="300" hidden></canvas>
@@ -61,7 +61,7 @@
           <canvas id="gameCanvas" width="1280" height="720"></canvas>
           <div class="hud">
             <div class="hud-box">
-              <span>Poang</span>
+              <span>Poäng</span>
               <strong id="scoreValue">0</strong>
             </div>
             <div class="hud-box">
@@ -70,7 +70,7 @@
             </div>
             <div class="hud-box">
               <span>Status</span>
-              <strong id="statusValue">Ta ett foto for att borja</strong>
+              <strong id="statusValue">Ta ett foto för att börja</strong>
             </div>
           </div>
           <button id="actionButton" class="action-button" disabled>Starta spel</button>
@@ -81,8 +81,8 @@
     <section class="overlay hidden" id="gameOverOverlay" aria-hidden="true">
       <div class="overlay-card">
         <p class="eyebrow">Game over</p>
-        <h2>Ditt resultat: <span id="finalScore">0</span> poang</h2>
-        <p id="finalMessage">Fyll i dina uppgifter for att komma med pa highscore-listan.</p>
+        <h2>Ditt resultat: <span id="finalScore">0</span> poäng</h2>
+        <p id="finalMessage">Fyll i dina uppgifter för att komma med på highscore-listan.</p>
         <form id="scoreForm" class="score-form">
           <label>
             Namn
@@ -99,7 +99,7 @@
     </section>
 
     <button id="adminResetButton" class="admin-reset-button" type="button">
-      Admin: nollstall highscore
+      Admin: nollställ highscore
     </button>
     <p id="adminResetStatus" class="admin-reset-status" aria-live="polite"></p>
 

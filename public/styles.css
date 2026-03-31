@@ -19,7 +19,7 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  font-family: "Bricolage Grotesque", sans-serif;
+  font-family: "Ubuntu", sans-serif;
   background:
     radial-gradient(circle at top left, rgba(108, 197, 255, 0.25), transparent 30%),
     linear-gradient(145deg, #0c2137, #163f69 60%, #24588b);

@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Ubuntu:wght@500;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles.css" />
@@ -15,12 +15,12 @@
   <body class="tv">
     <main class="tv-shell">
       <section class="tv-hero">
-        <p class="eyebrow">Moderaternas arsmote</p>
-        <h1>Dagens dorrknackare</h1>
-        <p>Topplistan uppdateras automatiskt nar nya spelare skickar in sina resultat.</p>
+        <p class="eyebrow">Moderaternas årsmöte</p>
+        <h1>Dagens dörrknackare</h1>
+        <p>Topplistan uppdateras automatiskt när nya spelare skickar in sina resultat.</p>
         <div class="tv-actions">
           <button id="resetScoresButton" class="button danger-button" type="button">
-            Nollstall highscore
+            Nollställ highscore
           </button>
           <p id="resetStatus" class="tv-status"></p>
         </div>
@@ -30,7 +30,7 @@
         <header class="tv-board-header">
           <span>Placering</span>
           <span>Namn</span>
-          <span>Poang</span>
+          <span>Poäng</span>
         </header>
         <div id="scoreRows" class="tv-rows"></div>
       </section>
@@ -43,7 +43,7 @@
 
       function renderScores(scores) {
         if (!scores.length) {
-          scoreRows.innerHTML = '<div class="tv-empty">Ingen har spelat an. Var forst!</div>';
+          scoreRows.innerHTML = '<div class="tv-empty">Ingen har spelat än. Var först!</div>';
           return;
         }
 
@@ -69,7 +69,7 @@
 
       async function resetScores() {
         const confirmed = window.confirm(
-          "Ar du saker pa att du vill nollstalla highscore-listan?",
+          "Är du säker på att du vill nollställa highscore-listan?",
         );
 
         if (!confirmed) {
@@ -77,7 +77,7 @@
         }
 
         resetScoresButton.disabled = true;
-        resetStatus.textContent = "Nollstaller...";
+        resetStatus.textContent = "Nollställer...";
 
         try {
           const response = await fetch("/api/scores/reset", {
@@ -85,11 +85,11 @@
           });
 
           if (!response.ok) {
-            throw new Error("Kunde inte nollstalla highscore-listan.");
+            throw new Error("Kunde inte nollställa highscore-listan.");
           }
 
           await loadScores();
-          resetStatus.textContent = "Highscore-listan ar nu nollstalld.";
+          resetStatus.textContent = "Highscore-listan är nu nollställd.";
         } catch (error) {
           resetStatus.textContent = error.message;
         } finally {
