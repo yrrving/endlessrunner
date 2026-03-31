@@ -11,10 +11,16 @@ services:
         value: "3000"
       - key: DATA_DIR
         value: /var/data/endlessrunner
+      - key: SMTP_SERVICE
+        value: gmail
+      - key: SMTP_USER
+        value: yrrving@gmail.com
+      - key: SMTP_PASS
+        sync: false
       - key: RESEND_API_KEY
         sync: false
       - key: MAIL_FROM
-        value: onboarding@resend.dev
+        value: yrrving@gmail.com
       - key: MAIL_TO
         value: accounts@trainstation.se
       - key: GAME_MAIL_TAG

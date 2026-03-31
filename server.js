@@ -3,6 +3,7 @@ require("dotenv").config({ quiet: true });
 const crypto = require("crypto");
 const express = require("express");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
 const path = require("path");
 const { Resend } = require("resend");
 
@@ -61,13 +62,53 @@ function isValidEmail(value) {
 }
 
 function createMailer() {
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  const smtpService = process.env.SMTP_SERVICE;
+  const smtpHost = process.env.SMTP_HOST;
+
+  if (smtpUser && smtpPass) {
+    if (smtpService === "gmail") {
+      return {
+        mode: "smtp",
+        client: nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: smtpUser,
+            pass: smtpPass,
+          },
+        }),
+      };
+    }
+
+    if (!smtpHost) {
+      throw new Error("SMTP_HOST saknas i .env nar egen SMTP-server anvands.");
+    }
+
+    return {
+      mode: "smtp",
+      client: nodemailer.createTransport({
+        host: smtpHost,
+        port: Number(process.env.SMTP_PORT || 587),
+        secure: process.env.SMTP_SECURE === "true",
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      }),
+    };
+  }
+
   const apiKey = process.env.RESEND_API_KEY;
 
   if (!apiKey) {
-    throw new Error("RESEND_API_KEY saknas. Lagg in er Resend API-nyckel i .env.");
+    throw new Error("Varken SMTP eller RESEND_API_KEY ar konfigurerat.");
   }
 
-  return new Resend(apiKey);
+  return {
+    mode: "resend",
+    client: new Resend(apiKey),
+  };
 }
 
 function sanitizeFileName(value) {
@@ -99,33 +140,53 @@ function validateMailConfig() {
 async function sendScoreEmail(entry) {
   validateMailConfig();
 
-  const resend = createMailer();
+  const mailer = createMailer();
   const recipient = process.env.MAIL_TO || "accounts@trainstation.se";
   const pngBuffer = dataUrlToPngBuffer(entry.photoDataUrl);
   const fileName = `monterspel_${sanitizeFileName(entry.name)}_${Date.now()}.png`;
   const subjectTag = process.env.GAME_MAIL_TAG || "[ENDLESSRUNNER][ARSMOTE 2026]";
+  const from = process.env.MAIL_FROM;
+  const subject = `${subjectTag} ${entry.name} (${entry.score} poang)`;
+  const text = [
+    "Ny spelare inskickad fran endlessrunner-spelet.",
+    "",
+    `Namn: ${entry.name}`,
+    `E-post: ${entry.email}`,
+    `Poang: ${entry.score}`,
+    `Tid: ${entry.createdAt}`,
+  ].join("\n");
 
-  await resend.emails.send({
-    from: process.env.MAIL_FROM,
-    to: recipient,
-    replyTo: entry.email,
-    subject: `${subjectTag} ${entry.name} (${entry.score} poang)`,
-    text: [
-      "Ny spelare inskickad fran endlessrunner-spelet.",
-      "",
-      `Namn: ${entry.name}`,
-      `E-post: ${entry.email}`,
-      `Poang: ${entry.score}`,
-      `Tid: ${entry.createdAt}`,
-    ].join("\n"),
-    attachments: [
-      {
-        filename: fileName,
-        content: pngBuffer.toString("base64"),
-        contentType: "image/png",
-      },
-    ],
-  });
+  if (mailer.mode === "smtp") {
+    await mailer.client.sendMail({
+      from,
+      to: recipient,
+      replyTo: entry.email,
+      subject,
+      text,
+      attachments: [
+        {
+          filename: fileName,
+          content: pngBuffer,
+          contentType: "image/png",
+        },
+      ],
+    });
+  } else {
+    await mailer.client.emails.send({
+      from,
+      to: recipient,
+      replyTo: entry.email,
+      subject,
+      text,
+      attachments: [
+        {
+          filename: fileName,
+          content: pngBuffer.toString("base64"),
+          contentType: "image/png",
+        },
+      ],
+    });
+  }
 
   fs.writeFileSync(path.join(submissionsDir, fileName), pngBuffer);
 
