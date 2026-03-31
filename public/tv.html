@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Highscore-TV</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="tv">
+    <main class="tv-shell">
+      <section class="tv-hero">
+        <p class="eyebrow">Moderaternas arsmote</p>
+        <h1>Dagens dorrknackare</h1>
+        <p>Topplistan uppdateras automatiskt nar nya spelare skickar in sina resultat.</p>
+        <div class="tv-actions">
+          <button id="resetScoresButton" class="button danger-button" type="button">
+            Nollstall highscore
+          </button>
+          <p id="resetStatus" class="tv-status"></p>
+        </div>
+      </section>
+
+      <section class="tv-board">
+        <header class="tv-board-header">
+          <span>Placering</span>
+          <span>Namn</span>
+          <span>Poang</span>
+        </header>
+        <div id="scoreRows" class="tv-rows"></div>
+      </section>
+    </main>
+
+    <script>
+      const scoreRows = document.getElementById("scoreRows");
+      const resetScoresButton = document.getElementById("resetScoresButton");
+      const resetStatus = document.getElementById("resetStatus");
+
+      function renderScores(scores) {
+        if (!scores.length) {
+          scoreRows.innerHTML = '<div class="tv-empty">Ingen har spelat an. Var forst!</div>';
+          return;
+        }
+
+        scoreRows.innerHTML = scores
+          .slice(0, 10)
+          .map(
+            (entry, index) => `
+              <article class="tv-row ${index === 0 ? "is-leading" : ""}">
+                <span>#${index + 1}</span>
+                <strong>${entry.name}</strong>
+                <span>${entry.score}</span>
+              </article>
+            `,
+          )
+          .join("");
+      }
+
+      async function loadScores() {
+        const response = await fetch("/api/scores");
+        const data = await response.json();
+        renderScores(data.scores || []);
+      }
+
+      async function resetScores() {
+        const confirmed = window.confirm(
+          "Ar du saker pa att du vill nollstalla highscore-listan?",
+        );
+
+        if (!confirmed) {
+          return;
+        }
+
+        resetScoresButton.disabled = true;
+        resetStatus.textContent = "Nollstaller...";
+
+        try {
+          const response = await fetch("/api/scores/reset", {
+            method: "POST",
+          });
+
+          if (!response.ok) {
+            throw new Error("Kunde inte nollstalla highscore-listan.");
+          }
+
+          await loadScores();
+          resetStatus.textContent = "Highscore-listan ar nu nollstalld.";
+        } catch (error) {
+          resetStatus.textContent = error.message;
+        } finally {
+          setTimeout(() => {
+            resetStatus.textContent = "";
+          }, 3000);
+          resetScoresButton.disabled = false;
+        }
+      }
+
+      loadScores();
+      setInterval(loadScores, 5000);
+      resetScoresButton.addEventListener("click", resetScores);
+    </script>
+  </body>
+  </html>

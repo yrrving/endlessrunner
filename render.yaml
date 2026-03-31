@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: endlessrunner
+    runtime: node
+    plan: starter
+    autoDeploy: true
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: DATA_DIR
+        value: /var/data/endlessrunner
+      - key: RESEND_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        value: onboarding@resend.dev
+      - key: MAIL_TO
+        value: accounts@trainstation.se
+      - key: GAME_MAIL_TAG
+        value: "[ENDLESSRUNNER][ARSMOTE 2026]"
+    disk:
+      name: endlessrunner-data
+      mountPath: /var/data
+      sizeGB: 1
