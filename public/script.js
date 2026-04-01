@@ -39,6 +39,15 @@ const game = {
   endMessage: "",
 };
 
+function isCompactViewport() {
+  return window.matchMedia("(max-width: 820px)").matches;
+}
+
+function syncResponsiveGameMetrics() {
+  game.playerX = isCompactViewport() ? 250 : 280;
+  game.speed = isCompactViewport() ? 6.6 : 7.5;
+}
+
 function syncLayoutMode() {
   const shouldFocusGame = game.state === "ready" || game.state === "running" || game.state === "gameover" || game.state === "submitting";
   document.body.classList.toggle("game-focus", shouldFocusGame);
@@ -235,6 +244,17 @@ function markMiss(door) {
   }
 }
 
+function getKnockWindow(door) {
+  const compact = isCompactViewport();
+  const lateWindow = compact ? 34 : 22;
+  const earlyWindow = Math.max(compact ? 148 : 118, door.width * (compact ? 1.15 : 0.92));
+
+  return {
+    min: -lateWindow,
+    max: earlyWindow,
+  };
+}
+
 function gameLoop() {
   if (game.state !== "running") {
     render();
@@ -244,7 +264,10 @@ function gameLoop() {
   for (const door of game.doors) {
     door.x -= game.speed;
 
-    if (!door.knocked && !door.missed && door.x + door.width < game.playerX - 26) {
+    const compact = isCompactViewport();
+    const missThreshold = compact ? 62 : 38;
+
+    if (!door.knocked && !door.missed && door.x + door.width < game.playerX - missThreshold) {
       markMiss(door);
     }
   }
@@ -274,7 +297,8 @@ function handleTap() {
 
   const targetDoor = game.doors.find((door) => {
     const distance = door.x - (game.playerX + 40);
-    return !door.knocked && !door.missed && distance > -15 && distance < 80;
+    const knockWindow = getKnockWindow(door);
+    return !door.knocked && !door.missed && distance > knockWindow.min && distance < knockWindow.max;
   });
 
   if (!targetDoor) {
@@ -515,7 +539,12 @@ window.addEventListener("keydown", (event) => {
     handleTap();
   }
 });
+window.addEventListener("resize", () => {
+  syncResponsiveGameMetrics();
+  render();
+});
 
+syncResponsiveGameMetrics();
 resetDoors();
 updateHud();
 render();

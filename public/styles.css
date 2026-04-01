@@ -510,3 +510,115 @@ body.game-focus .camera-card {
     aspect-ratio: 16 / 9;
   }
 }
+
+@media (max-width: 820px) {
+  .app-shell {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .brand-panel,
+  .game-panel {
+    border-radius: 22px;
+  }
+
+  .brand-panel {
+    padding: 22px 18px;
+  }
+
+  .intro {
+    font-size: 1rem;
+  }
+
+  .rules {
+    gap: 10px;
+    margin: 18px 0;
+  }
+
+  .rules div {
+    padding: 12px 14px;
+    font-size: 0.94rem;
+  }
+
+  .game-panel {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .camera-preview-wrap {
+    max-width: 340px;
+    margin: 0 auto;
+  }
+
+  .camera-actions {
+    grid-template-columns: 1fr;
+  }
+
+  #gameCanvas {
+    aspect-ratio: 16 / 10;
+    min-height: 54vh;
+    max-height: 68vh;
+  }
+
+  .hud {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .hud-box {
+    padding: 12px 14px;
+  }
+
+  .hud-box:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .hud-box strong {
+    font-size: 1.1rem;
+  }
+
+  .action-button {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: calc(100% - 24px);
+    min-width: 0;
+    transform: none;
+  }
+
+  .overlay {
+    padding: 14px;
+  }
+
+  .overlay-card {
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+
+  .admin-reset-button {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .admin-reset-status {
+    right: 12px;
+    bottom: 58px;
+    max-width: min(260px, calc(100vw - 24px));
+  }
+
+  body.game-focus {
+    overflow: hidden;
+  }
+
+  body.game-focus .brand-panel {
+    display: none;
+  }
+
+  body.game-focus .app-shell {
+    grid-template-columns: 1fr;
+    height: 100vh;
+  }
+}
