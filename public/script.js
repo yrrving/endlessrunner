@@ -22,6 +22,16 @@ const adminResetStatus = document.getElementById("adminResetStatus");
 const ctx = gameCanvas.getContext("2d");
 const snapshotContext = snapshotCanvas.getContext("2d");
 
+const otherPartyBadges = [
+  { initials: "S", name: "Socialdemokraterna", color: "#e03a3e" },
+  { initials: "V", name: "Vänsterpartiet", color: "#c41230" },
+  { initials: "C", name: "Centerpartiet", color: "#2e8b57" },
+  { initials: "L", name: "Liberalerna", color: "#1e88e5" },
+  { initials: "KD", name: "Kristdemokraterna", color: "#235aa6" },
+  { initials: "MP", name: "Miljöpartiet", color: "#5ca832" },
+  { initials: "SD", name: "Sverigedemokraterna", color: "#f6c344" },
+];
+
 const game = {
   state: "idle",
   score: 0,
@@ -76,11 +86,15 @@ function resetDoors() {
   }
 }
 
+function getRandomOtherPartyBadge() {
+  return otherPartyBadges[Math.floor(Math.random() * otherPartyBadges.length)];
+}
+
 function spawnDoor(x = gameCanvas.width + Math.random() * 240) {
   const width = 88 + Math.random() * 28;
   const height = 160 + Math.random() * 220;
-  const hasVisibleSosse = game.doors.some((door) => door.isSosse && !door.missed && !door.knocked);
-  const isSosse = !hasVisibleSosse && Math.random() < 0.12;
+  const hasVisibleTrapDoor = game.doors.some((door) => door.isTrapDoor && !door.missed && !door.knocked);
+  const isTrapDoor = !hasVisibleTrapDoor && Math.random() < 0.12;
   game.doors.push({
     id: crypto.randomUUID(),
     x,
@@ -88,7 +102,8 @@ function spawnDoor(x = gameCanvas.width + Math.random() * 240) {
     height,
     knocked: false,
     missed: false,
-    isSosse,
+    isTrapDoor,
+    badge: isTrapDoor ? getRandomOtherPartyBadge() : null,
   });
 }
 
@@ -134,31 +149,37 @@ function drawDoor(door) {
   ctx.arc(door.width - 18, door.height / 2, 5, 0, Math.PI * 2);
   ctx.fill();
 
-  if (door.isSosse && !door.knocked && !door.missed) {
-    ctx.fillStyle = "#d93d34";
-    ctx.fillRect(14, 16, door.width - 28, 18);
+  if (door.isTrapDoor && !door.knocked && !door.missed) {
+    const badge = door.badge || getRandomOtherPartyBadge();
+    const badgeRadius = Math.min(30, door.width * 0.32);
+    const badgeX = door.width / 2;
+    const badgeY = Math.max(48, door.height * 0.28);
 
-    ctx.fillStyle = "#ffe0cc";
+    ctx.fillStyle = "#f8fbff";
+    ctx.fillRect(14, 16, door.width - 28, 28);
+
+    ctx.fillStyle = badge.color;
     ctx.beginPath();
-    ctx.arc(door.width / 2, 52, 20, 0, Math.PI * 2);
+    ctx.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.strokeStyle = "#13324d";
-    ctx.lineWidth = 4;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 5;
     ctx.beginPath();
-    ctx.moveTo(door.width / 2 - 8, 50);
-    ctx.lineTo(door.width / 2 - 2, 50);
-    ctx.moveTo(door.width / 2 + 2, 50);
-    ctx.lineTo(door.width / 2 + 8, 50);
+    ctx.arc(badgeX, badgeY, badgeRadius - 3, 0, Math.PI * 2);
     ctx.stroke();
 
-    ctx.beginPath();
-    ctx.arc(door.width / 2, 60, 8, 0.2, Math.PI - 0.2, true);
-    ctx.stroke();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `700 ${badge.initials.length > 1 ? 20 : 26}px "IBM Plex Mono", monospace`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(badge.initials, badgeX, badgeY + 1);
+    ctx.textAlign = "start";
+    ctx.textBaseline = "alphabetic";
 
-    ctx.fillStyle = "#fff0f0";
-    ctx.font = '700 16px "IBM Plex Mono", monospace';
-    ctx.fillText("SOSSE", 14, 30);
+    ctx.fillStyle = "#13324d";
+    ctx.font = '700 12px "IBM Plex Mono", monospace';
+    ctx.fillText("ANNAN", 20, 35);
   }
 
   if (door.knocked) {
@@ -232,7 +253,7 @@ function markMiss(door) {
 
   door.missed = true;
 
-  if (door.isSosse) {
+  if (door.isTrapDoor) {
     return;
   }
 
@@ -305,9 +326,10 @@ function handleTap() {
     return;
   }
 
-  if (targetDoor.isSosse) {
+  if (targetDoor.isTrapDoor) {
     targetDoor.knocked = true;
-    endGame("Aj då! Du knackade på en Sosse och åkte ut direkt.");
+    const partyName = targetDoor.badge?.name ? ` (${targetDoor.badge.name})` : "";
+    endGame(`Aj då! Du knackade på fel partimärke${partyName} och åkte ut direkt.`);
     return;
   }
 
